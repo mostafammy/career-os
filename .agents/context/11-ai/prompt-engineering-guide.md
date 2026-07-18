@@ -2,7 +2,7 @@
 id: META-004
 title: "Prompt Engineering Guide"
 status: canonical
-version: "1.0"
+version: "2.0"
 owner: "Prompt Engineering Agent"
 created: "2026-07-18"
 modified: "2026-07-18"
@@ -10,7 +10,7 @@ phase: 1
 stability: high
 change_frequency: low
 confidence: 1.0
-source_of_truth: ".agents/context/11-ai/prompt-engineering-guide.md"
+source_of_truth: "docs/PROMPT_ENGINEERING_GUIDE.md"
 tags:
   - meta
   - prompts
@@ -18,13 +18,19 @@ always_loaded: false
 token_budget: 600
 ---
 
-# META-004 — Prompt Engineering Guide
+# META-004 — Prompt Engineering Guide (Index)
 
-## Purpose
+## Full Guide
 
-Index and operating rules for prompt assets. **Prompts are production assets**, versioned and eval-gated.
+**Canonical location:** `docs/PROMPT_ENGINEERING_GUIDE.md`
 
-## Asset Map
+This file is the module stub. Load the full guide when authoring or reviewing prompts.
+
+## The Fundamental Law
+
+> A prompt is ONLY the delta — the information the agent cannot already know from context.
+
+## Asset Map (AI Capability Prompts)
 
 | ID | File | Role |
 |---|---|---|
@@ -35,7 +41,32 @@ Index and operating rules for prompt assets. **Prompts are production assets**, 
 | APPLICATION-012 | `application/evaluation/evals.ctx.md` | Ship metrics |
 | APPLICATION-013 | `application/testing/ai-test-cases.ctx.md` | Concrete cases |
 
-## Change Protocol
+## What NEVER Appears in Prompts (Summary)
+
+Anything already in context modules. Key examples:
+- Tech stack → APPLICATION-007
+- Architecture rules → CORE-003
+- Coding standards → CORE-005
+- Security rules → APPLICATION-006
+- Glossary → CORE-002
+- Domain state machines → DOMAIN-*
+- Phase boundaries → ROADMAP-001
+
+## What ALWAYS Appears in Prompts
+
+1. Task objective (one sentence)
+2. Task-specific inputs
+3. Acceptance criteria (binary, measurable)
+4. Expected artifacts (file paths)
+5. Authority level (solo / peer-review / human-gate)
+
+## 15 Prompt Templates
+
+See `docs/PROMPT_ENGINEERING_GUIDE.md` Section 8:
+Feature · Bug Fix · Refactoring · ADR · Testing · Performance · DB Migration ·
+API · Frontend · Backend · Documentation · Review · Security · AI Capability · Automation
+
+## Prompt Change Protocol
 
 1. Edit the owning PROMPT-* module (SSOT — not only inline code).
 2. Bump `prompt_version` (semver; breaking schema = major).
@@ -52,13 +83,17 @@ Index and operating rules for prompt assets. **Prompts are production assets**, 
 - Terminology from CORE-002 only.
 - Proposal tools default; commit tools gated.
 
-## Anti-Patterns
+## Anti-Patterns (Top 6)
 
-- Prompt-only fixes for domain bugs
-- Shipping without eval delta
-- Duplicating diverging copies in code and context
-- “Ignore previous instructions” vulnerability untested
+- Repeating architecture/tech stack in prompts (AP-001, AP-002)
+- Vague acceptance criteria (AP-004)
+- Pasting PRD content (AP-005)
+- Security reminders that imply it is optional (AP-006)
+- Missing definition of done (AP-009)
+- Prompt as architecture discussion (AP-010)
+
+Full list (AP-001 through AP-012): `docs/PROMPT_ENGINEERING_GUIDE.md` Section 10.
 
 ## Canonical Source
 
-Principal Review (Prompt Layer gap) + APPLICATION-001.
+`docs/PROMPT_ENGINEERING_GUIDE.md` v1.0
