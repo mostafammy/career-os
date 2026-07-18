@@ -491,3 +491,215 @@ Aggregates may split.
 Events may version.
 
 Canonical identities never change.
+
+---
+
+# 19. Entity Categories
+
+## Strategic
+
+- Vision
+- Mission
+- Goal
+- Milestone
+- Career Capital
+
+## Operational
+
+- Opportunity
+- Application
+- Task
+- Reminder
+- Calendar Event
+
+## Knowledge
+
+- Knowledge Entry
+- Reflection
+- Decision Journal
+- AI Insight
+
+## Resources
+
+- Document
+- Organization
+- Contact
+- Template
+
+## System
+
+- Notification
+- Activity
+- Automation
+- Integration
+- Settings
+
+---
+
+# 20. Entity Definition Template
+
+Every entity shall define:
+
+- Purpose
+- Identity
+- Attributes
+- Relationships
+- Lifecycle (canonical source: `docs/03-domain/state-machines.md`)
+- Business Rules
+- Domain Events
+- Computed Properties
+- Permissions
+- Validation Rules
+- Future Extensions
+
+---
+
+# 21. Entity Definitions
+
+## 21.1 Opportunity
+
+**Purpose:** Represents a potential career opportunity worth evaluating.
+
+**Examples:** Scholarship, Internship, Job, Hackathon, Conference, Research Position, Grant, Competition, Exchange Program
+
+**Identity:** Opportunity ID — immutable, globally unique, opaque.
+
+**Lifecycle:** Canonical definition in `docs/03-domain/state-machines.md` (§1 — Opportunity Lifecycle).
+
+**Relationships:**
+- Belongs to: User
+- May belong to: Mission, Goal, Organization
+- Contains: Applications, Tasks, Documents, Knowledge, Activities, Timeline, AI Insights
+
+**Business Rules:**
+- Deadline cannot precede creation.
+- Archived opportunities cannot receive new applications.
+- Deleted opportunities remain recoverable until retention policy expires.
+- Opportunity status transitions must follow lifecycle rules (§22).
+
+**Domain Events:**
+OpportunityCreated, OpportunityUpdated, OpportunityArchived, OpportunityDeleted, OpportunityRestored, OpportunityScored, DeadlineChanged, PriorityChanged
+
+**Computed Properties:**
+Opportunity Score, Days Remaining, Preparation Progress, Application Count, Completion Percentage, Risk Level, Strategic Alignment
+
+---
+
+## 21.2 Application
+
+**Purpose:** Represents one submission to one opportunity.
+
+**Lifecycle:** Canonical definition in `docs/03-domain/state-machines.md` (§2 — Application Lifecycle).
+
+**Relationships:**
+- Belongs to: Opportunity, Organization
+- Contains: Documents, Interview Notes, Reflection, Timeline
+
+**Computed Properties:**
+Readiness Score, Submission Duration, Waiting Time, Interview Count, Success Probability
+
+---
+
+## 21.3 Organization
+
+**Purpose:** Represents an external institution.
+
+**Examples:** University, Company, NGO, Research Institute, Government Agency
+
+**Relationships:**
+- Owns: Opportunities, Applications, Contacts, Knowledge, Analytics
+
+**Computed Properties:**
+Historical Success Rate, Relationship Strength, Average Response Time, Career Capital Contribution
+
+---
+
+## 21.4 Goal
+
+**Purpose:** Represents a measurable strategic objective.
+
+**Lifecycle:** Canonical definition in `docs/03-domain/state-machines.md` (§3 — Goal Lifecycle).
+
+**Relationships:**
+- Belongs to: Mission
+- Contains: Milestones, Opportunities, Career Capital
+
+**Computed Properties:**
+Progress, Remaining Effort, Confidence, Strategic Value
+
+---
+
+## 21.5 Document
+
+**Purpose:** Represents reusable assets.
+
+**Examples:** CV, Passport, Essay, Recommendation Letter, Portfolio, Certificate, Transcript
+
+**Relationships:**
+- Linked to: Applications, Goals, Organizations, Opportunities
+
+**Computed Properties:**
+Version Count, Reuse Count, Expiration Status, Current Version
+
+---
+
+## 21.6 Reflection
+
+**Purpose:** Captures structured learning after meaningful events.
+
+**Relationships:**
+- Linked to: Application, Opportunity, Goal, Decision Journal, Knowledge Base
+
+**Computed Properties:**
+Insight Count, Learning Score
+
+---
+
+## 21.7 Activity
+
+**Purpose:** Immutable historical record. Activities never change. Activities never disappear.
+
+**Explains:** Who, What, When, Why
+
+**Rules:**
+- INV-004: Activities are immutable.
+- INV-010: Business events never mutate historical events.
+
+---
+
+# 22. Domain Events
+
+Every entity publishes events. Every subsystem reacts to events.
+
+**Standard Events:** Created, Updated, Archived, Deleted, Linked, Completed, Reviewed, Scored
+
+**See:** `docs/05-engineering/ecs.md` for the complete Event Catalog.
+
+---
+
+# 23. Aggregate Roots
+
+Aggregate Roots: Opportunity, Application, Goal, Organization, Document
+
+Each aggregate protects its own consistency. Nothing modifies child entities directly through the root.
+
+---
+
+# 24. Ubiquitous Language
+
+The following terms have canonical meanings. These meanings remain consistent throughout the product.
+
+| Term | Canonical Meaning |
+|---|---|
+| Opportunity | A potential career path worth evaluating |
+| Application | A concrete submission to one opportunity |
+| Mission | A strategic objective composed of multiple Goals |
+| Goal | A measurable objective supporting one or more Missions |
+| Reflection | A structured analysis after a meaningful experience |
+| Knowledge | Reusable structured knowledge derived from experience |
+| Decision | A recorded reasoning behind an important career choice |
+| Workspace | The primary interface for interacting with a single entity |
+| Timeline | A chronological representation of significant activities |
+| Activity | An immutable historical record of something that happened |
+
+**See:** `docs/00-overview/glossary.md` for the complete glossary.
