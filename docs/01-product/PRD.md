@@ -658,45 +658,21 @@ Ascending and descending order shall be supported.
 
 Each opportunity shall possess exactly one status.
 
-Example lifecycle:
+The system shall track opportunity status through a dual-lifecycle model.
 
-Discovered
+**Opportunity Lifecycle** (evaluation decision):
 
-↓
+CAPTURED → EVALUATING → ACTIONED (terminal)
+                  ↓
+               ARCHIVED
 
-Researching
+**Application Lifecycle** (execution tracking):
 
-↓
-
-Preparing
-
-↓
-
-Ready
-
-↓
-
-Submitted
-
-↓
-
-Waiting
-
-↓
-
-Interview
-
-↓
-
-Accepted
-
-or
-
-Rejected
-
-or
-
-Archived
+DRAFTING → SUBMITTED → INTERVIEWING → OFFER_RECEIVED → ACCEPTED / DECLINED
+                  ↓           ↓              ↓
+              REJECTED    REJECTED       WITHDRAWN
+                  ↓           ↓              ↓
+            (terminal)  (terminal)     (terminal)
 
 Status transitions shall be recorded.
 
@@ -916,41 +892,22 @@ Every Opportunity:
 
 ## Lifecycle
 
-Discovered
+**Canonical Definition:** `docs/03-domain/state-machines.md` (§1 - Opportunity Lifecycle)
 
-↓
+The Opportunity lifecycle follows a **dual-lifecycle design** where Opportunity and Application are separate aggregates with independent state machines. The Opportunity lifecycle models the **evaluation decision** ("Should I pursue this?") with four states:
 
-Researching
+```
+CAPTURED → EVALUATING → ACTIONED → (terminal)
+                  ↓
+               ARCHIVED
+```
 
-↓
+- **CAPTURED**: Raw entry point. Minimal data required.
+- **EVALUATING**: Active scoring against Goals (Strategy Context).
+- **ACTIONED**: Terminal. User decided to pursue. Application entity auto-created.
+- **ARCHIVED**: Soft-deleted. Revocable.
 
-Preparing
-
-↓
-
-Ready
-
-↓
-
-Submitted
-
-↓
-
-Under Review
-
-↓
-
-Interview
-
-↓
-
-Accepted
-
-Rejected
-
-Withdrawn
-
-Archived
+**Full state machine, transition rules, and domain rules:** See `docs/03-domain/state-machines.md` §1
 
 ---
 
@@ -1051,39 +1008,24 @@ Applications manage:
 
 ## Lifecycle
 
-Draft
+**Canonical Definition:** `docs/03-domain/state-machines.md` (§2 - Application Lifecycle)
 
-↓
+The Application lifecycle models the **execution tracking** ("How am I pursuing this?") with eight states:
 
-Preparing
+```
+DRAFTING → SUBMITTED → INTERVIEWING → OFFER_RECEIVED → ACCEPTED
+    ↓            ↓              ↓                ↓          ↓
+WITHDRAWN    REJECTED       REJECTED          DECLINED   (terminal)
+             WITHDRAWN      WITHDRAWN
+```
 
-↓
+- **DRAFTING**: Preparing deliverables (essays, CV, documents).
+- **SUBMITTED**: Application delivered. Timestamp locked. Follow-ups scheduled.
+- **INTERVIEWING**: Active interview process. Generates Activity records.
+- **OFFER_RECEIVED**: Positive decision. Pending user acceptance.
+- **ACCEPTED/REJECTED/DECLINED/WITHDRAWN**: Terminal states. Trigger Reflection prompts.
 
-Ready
-
-↓
-
-Submitted
-
-↓
-
-Under Review
-
-↓
-
-Interview
-
-↓
-
-Offer
-
-↓
-
-Accepted
-
-Rejected
-
-Withdrawn
+**Full state machine, transition rules, and domain rules:** See `docs/03-domain/state-machines.md` §2
 
 ---
 
@@ -3050,365 +2992,113 @@ History should never be rewritten.
 
 ## Overview
 
-The Opportunity Lifecycle models the user's decision process before and after pursuing an opportunity.
+**Canonical Definition:** `docs/03-domain/state-machines.md` (§1 - Opportunity Lifecycle)
+
+The Opportunity Lifecycle models the **evaluation decision** ("Should I pursue this?"). This is a **dual-lifecycle design** where Opportunity and Application are separate aggregates with independent state machines.
+
+The Opportunity lifecycle has **4 states**:
 
 ```
-Discovered
-
-↓
-
-Researching
-
-↓
-
-Preparing
-
-↓
-
-Ready
-
-↓
-
-Submitted
-
-↓
-
-Under Review
-
-↓
-
-Interview
-
-↓
-
-Accepted
-
-Rejected
-
-Withdrawn
-
-Expired
-
-Archived
+CAPTURED → EVALUATING → ACTIONED → (terminal)
+                  ↓
+               ARCHIVED
 ```
 
----
-
-## State Definitions
-
-### Discovered
-
-The opportunity has been captured.
-
-No research has begun.
-
-Entry Conditions
-
-• Opportunity created.
-
-Exit Conditions
-
-• Research begins.
-
----
-
-### Researching
-
-User is collecting information.
-
-Examples
-
-Eligibility
-
-Requirements
-
-Timeline
-
-Documents
-
-ROI
-
-Exit
-
-↓
-
-Preparing
-
-↓
-
-Archived
-
----
-
-### Preparing
-
-Application work has begun.
-
-Examples
-
-Writing essays
-
-Updating CV
-
-Collecting documents
-
-Exit
-
-↓
-
-Ready
-
-↓
-
-Withdrawn
-
----
-
-### Ready
-
-All required deliverables completed.
-
-Application may be submitted.
-
-Exit
-
-↓
-
-Submitted
-
----
-
-### Submitted
-
-Application officially submitted.
-
-No further preparation required.
-
-System should:
-
-• Record submission date.
-
-• Lock preparation metrics.
-
-• Schedule follow-up reminders.
-
----
-
-### Under Review
-
-Organization is reviewing application.
-
-User waits.
-
-System should display:
-
-Waiting Time
-
-Expected Response
-
-Last Update
-
----
-
-### Interview
-
-Interview scheduled.
-
-System should automatically surface:
-
-Interview notes
-
-Organization
-
-Contacts
-
-Preparation checklist
-
----
-
-### Accepted
-
-Successful outcome.
-
-Effects
-
-Generate celebration activity.
-
-Archive preparation tasks.
-
-Update analytics.
-
-Store success metrics.
-
----
-
-### Rejected
-
-Application unsuccessful.
-
-Effects
-
-Prompt reflection.
-
-Record feedback.
-
-Update analytics.
-
----
-
-### Withdrawn
-
-User intentionally exits process.
-
-Historical data preserved.
-
----
-
-### Expired
-
-Deadline passed before submission.
-
-Historical data preserved.
-
----
-
-### Archived
-
-Opportunity hidden from operational views.
-
-Always recoverable.
-
----
-
-# Allowed Transitions
-
-| From | To |
-|-------|----|
-| Discovered | Researching |
-| Researching | Preparing |
-| Researching | Archived |
-| Preparing | Ready |
-| Preparing | Withdrawn |
-| Ready | Submitted |
-| Submitted | Under Review |
-| Under Review | Interview |
-| Under Review | Accepted |
-| Under Review | Rejected |
-| Interview | Accepted |
-| Interview | Rejected |
-| Any Final State | Archived |
-
-Any transition not listed above is invalid.
+| State | Description |
+|-------|-------------|
+| **CAPTURED** | Raw entry point. Minimal data required. Auto-expires after 30 days if no deadline. |
+| **EVALUATING** | Active scoring against Goals. Research, comparison, decision-making. |
+| **ACTIONED** | Terminal. User decided to pursue. Application entity auto-created. |
+| **ARCHIVED** | Soft-deleted. Revocable. Includes expired, dismissed, and abandoned. |
+
+## Key Design Decisions
+
+1. **Opportunity ≠ Application**: The Opportunity lifecycle stops at ACTIONED. All submission, interview, and outcome tracking belongs to the Application lifecycle (§16.4).
+2. **"Expired" is not a state**: Expiration is an attribute-driven behavior (auto-archive when deadline passes), not a separate state.
+3. **"Preparing" is not a state**: Preparation work happens within the Application lifecycle (DRAFTING state), not the Opportunity lifecycle.
+
+## Transition Rules
+
+| From | To | Trigger | Side Effects |
+|------|-----|---------|--------------|
+| *(new)* | CAPTURED | Opportunity created | AI extraction begins async. Organization linked/created. |
+| CAPTURED | EVALUATING | User starts evaluation | Scoring dimensions initialized. Strategy Context loaded. |
+| CAPTURED | ARCHIVED | Auto-expire (30 days) OR manual dismiss | Toast with undo. Analytics updated. |
+| EVALUATING | ACTIONED | User clicks "Action"/"Apply" | **Application created** in DRAFTING. Score locked. Tasks generated. |
+| EVALUATING | ARCHIVED | User clicks "Not Now" | Reason logged (optional). Analytics updated. |
+| ARCHIVED | CAPTURED | User revives from Archive | Fresh evaluation required. Historical score discarded. |
+
+## Domain Rules
+
+- **OP-001**: CAPTURED for >30 days without deadline → auto-ARCHIVED (with undo).
+- **OP-002**: ACTIONED requires at least one active Goal for scoring alignment.
+- **OP-003**: One active Application per Opportunity maximum.
+- **OP-004**: ARCHIVED Opportunities remain searchable.
+- **OP-005**: Score locked at ACTIONED, stored in historical record.
+
+**Full state machine with Mermaid diagrams:** See `docs/03-domain/state-machines.md` §1
 
 ---
 
 # 16.4 Application Lifecycle
 
-Applications possess an independent lifecycle.
+**Canonical Definition:** `docs/03-domain/state-machines.md` (§2 - Application Lifecycle)
+
+The Application Lifecycle models the **execution tracking** ("How am I pursuing this?"). This is the second half of the dual-lifecycle design — the Opportunity lifecycle (§16.3) handles evaluation, and the Application lifecycle handles everything after the user decides to pursue.
+
+The Application lifecycle has **8 states**:
 
 ```
-Draft
-
-↓
-
-Preparing
-
-↓
-
-Ready
-
-↓
-
-Submitted
-
-↓
-
-Review
-
-↓
-
-Interview
-
-↓
-
-Offer
-
-↓
-
-Accepted
-
-Rejected
-
-Withdrawn
+DRAFTING → SUBMITTED → INTERVIEWING → OFFER_RECEIVED → ACCEPTED
+    ↓            ↓              ↓                ↓
+WITHDRAWN    REJECTED       REJECTED          DECLINED
+             WITHDRAWN      WITHDRAWN
 ```
 
----
+| State | Description |
+|-------|-------------|
+| **DRAFTING** | Preparing deliverables (essays, CV, documents). Created automatically when Opportunity transitions to ACTIONED. |
+| **SUBMITTED** | Application delivered. Timestamp locked. Follow-up reminders scheduled. |
+| **INTERVIEWING** | Active interview process. Generates Activity records for each round. |
+| **OFFER_RECEIVED** | Positive decision. Pending user acceptance. Deadline set. |
+| **ACCEPTED** | Terminal. Offer signed. Triggers celebration, reflection, Career Capital update. |
+| **REJECTED** | Terminal. Application denied. Triggers reflection prompt. |
+| **DECLINED** | Terminal. User rejects offer. Triggers reflection prompt. |
+| **WITHDRAWN** | Terminal. User abandons at any stage. Historical data preserved. |
 
-## State Behavior
+## Key Design Decisions
 
-Draft
+1. **"Preparing" and "Ready" are not states**: Preparation work happens within DRAFTING. The transition from DRAFTING to SUBMITTED is the single state change.
+2. **"Review" is not a state**: Organization review happens while the Application is in SUBMITTED state. The state doesn't change until the org responds (INTERVIEWING or REJECTED).
+3. **"Offer" maps to OFFER_RECEIVED**: Clear naming that indicates the offer has arrived.
+4. **DECLINED is separate from REJECTED**: DECLINED = user-initiated (rejecting an offer). REJECTED = org-initiated (application denied).
 
-Application exists.
+## Transition Rules
 
-No work completed.
+| From | To | Trigger | Side Effects |
+|------|-----|---------|--------------|
+| *(new)* | DRAFTING | Created from ACTIONED Opportunity | Documents linked. Tasks generated. |
+| DRAFTING | SUBMITTED | User clicks "Submit" | Timestamp locked. Metrics frozen. Reminders scheduled. |
+| DRAFTING | WITHDRAWN | User abandons | Historical data preserved. |
+| SUBMITTED | INTERVIEWING | Org invites for interview | Activity generated. Calendar event created. |
+| SUBMITTED | REJECTED | Org denies application | Reflection prompt. Feedback recorded. |
+| SUBMITTED | WITHDRAWN | User withdraws | Historical data preserved. |
+| INTERVIEWING | OFFER_RECEIVED | Org extends offer | Offer details recorded. Response deadline set. |
+| INTERVIEWING | REJECTED | Denied post-interview | Reflection prompt. Interview feedback recorded. |
+| INTERVIEWING | WITHDRAWN | User drops out | Historical data preserved. |
+| OFFER_RECEIVED | ACCEPTED | User accepts | Celebration. Career Capital update. Reflection prompt. |
+| OFFER_RECEIVED | DECLINED | User declines | Reflection prompt. Reason recorded (optional). |
 
----
+## Domain Rules
 
-Preparing
+- **APP-001**: DRAFTING requires at least one linked Document before SUBMITTED.
+- **APP-002**: SUBMITTED locks timestamp and prevents document edits.
+- **APP-003**: INTERVIEWING generates Activity records for each round.
+- **APP-004**: Terminal states (ACCEPTED, REJECTED, DECLINED) **must** prompt Reflection.
+- **APP-005**: WITHDRAWN requires optional reason before confirmation.
+- **APP-006**: Timeline view shows all state transitions with timestamps.
 
-Deliverables actively created.
-
----
-
-Ready
-
-Everything complete.
-
-Waiting for submission.
-
----
-
-Submitted
-
-Application officially delivered.
-
-Submission timestamp locked.
-
----
-
-Review
-
-Organization evaluating.
-
----
-
-Interview
-
-Interview process active.
-
----
-
-Offer
-
-Positive decision pending acceptance.
-
----
-
-Accepted
-
-Completed successfully.
-
----
-
-Rejected
-
-Completed unsuccessfully.
-
----
-
-Withdrawn
-
-Cancelled by applicant.
+**Full state machine with Mermaid diagrams:** See `docs/03-domain/state-machines.md` §2
 
 ---
 
@@ -3620,7 +3310,7 @@ Every transition may produce side effects.
 
 Examples
 
-Preparing
+DRAFTING (auto-created from ACTIONED Opportunity)
 
 ↓
 
@@ -3716,51 +3406,51 @@ Update analytics
 
 Examples
 
-Accepted
+ACCEPTED
 
 ↓
 
-Preparing
+DRAFTING
 
 ❌ Forbidden
 
 ---
 
-Rejected
+REJECTED
 
 ↓
 
-Interview
+INTERVIEWING
 
 ❌ Forbidden
 
 ---
 
-Archived
+ARCHIVED
 
 ↓
 
-Submitted
+SUBMITTED
 
 ❌ Forbidden
 
 ---
 
-Expired
+DECLINED
 
 ↓
 
-Preparing
+INTERVIEWING
 
 ❌ Forbidden
 
 ---
 
-Ready
+WITHDRAWN
 
 ↓
 
-Researching
+DRAFTING
 
 ❌ Forbidden
 
@@ -5112,21 +4802,11 @@ Visual Kanban representation.
 
 Columns
 
-Discovered
+Captured
 
-Researching
+Evaluating
 
-Preparing
-
-Ready
-
-Submitted
-
-Interview
-
-Accepted
-
-Rejected
+Actioned
 
 Archived
 
@@ -6753,110 +6433,6 @@ The system should optimize for sustainable career growth rather than maximizing 
 
 ---
 
-
-I think we've just discovered what CareerOS actually is.
-
-It is not:
-
-an ATS,
-a CRM,
-a task manager,
-or an opportunity tracker.
-
-It is a Personal Strategy Operating System.
-
-The Missing Layer
-
-Right now, the hierarchy is:
-
-Vision
-↓
-Mission
-↓
-Goals
-↓
-Milestones
-↓
-Opportunities
-
-But I believe there is an even more fundamental concept above Vision.
-
-Life Domains
-
-Imagine:
-
-Life Domains
-│
-├── Career
-├── Education
-├── Research
-├── Entrepreneurship
-├── Finance
-├── Health
-├── Relationships
-└── Personal Development
-
-Then:
-
-Life Domain
-        │
-        ▼
-Vision
-        │
-        ▼
-Mission
-        │
-        ▼
-Goals
-        │
-        ▼
-Milestones
-        │
-        ▼
-Career Capital
-        │
-        ▼
-Opportunities
-
-Why does this matter?
-
-Because once you build the engine correctly for Career, you've actually built a reusable strategic framework.
-
-Tomorrow you could add:
-
-ResearchOS
-StartupOS
-LearningOS
-HealthOS
-
-Each would reuse the same strategic architecture with different domain entities.
-
-If We Were Building a Venture-Scale Product
-
-Internally, I would define the architecture like this:
-
-                    PersonalOS Platform
-                           │
-      ┌────────────────────┼────────────────────┐
-      ▼                    ▼                    ▼
-  CareerOS            ResearchOS          StartupOS
-      │                    │                    │
-      └────────────────────┼────────────────────┘
-                           ▼
-                  Shared Strategy Engine
-                           │
-                    Goal Engine
-                    Decision Engine
-                    Knowledge Graph
-                    Event Engine
-                    Intelligence Layer
-
-That separation keeps CareerOS focused while making the underlying platform extensible.
-
-
-
----
-
 # 22. Analytics & Insight Engine
 
 ## 22.1 Purpose
@@ -7153,27 +6729,23 @@ Opportunity Funnel
 
 ```
 
-Discovered
+Captured
 
 ↓
 
-Researching
+Evaluating
 
 ↓
 
-Preparing
+Actioned
 
 ↓
 
-Ready
+Application Submitted
 
 ↓
 
-Submitted
-
-↓
-
-Interview
+Interviewing
 
 ↓
 
