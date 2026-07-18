@@ -8223,32 +8223,46 @@ CareerOS shall prioritize the following quality attributes:
 
 The system should remain responsive under normal usage.
 
-### User Interface
+### Quantitative Targets
+
+| Metric | Target | Measurement |
+|---|---|---|
+| Largest Contentful Paint (LCP) | < 2.5 seconds | Vercel Analytics |
+| First Input Delay (FID) | < 100 milliseconds | Vercel Analytics |
+| Cumulative Layout Shift (CLS) | < 0.1 | Vercel Analytics |
+| Time to First Byte (TTFB) | < 200 milliseconds | Vercel Analytics |
+| First Contentful Paint (FCP) | < 1.8 seconds | Lighthouse |
+| Total Blocking Time (TBT) | < 200 milliseconds | Lighthouse |
+
+### API Response Times
+
+| Operation | Target | Notes |
+|---|---|---|
+| Dashboard load | < 500 ms | Server-rendered, cached |
+| Opportunity list | < 300 ms | Indexed query |
+| Global search | < 500 ms | Full-text search |
+| Create Opportunity | < 200 ms | Direct insert |
+| Status transition | < 200 ms | Atomic transaction |
+| AI extraction (async) | < 10 seconds | Background job, non-blocking |
+| Document upload | < 3 seconds | Including file storage write |
+
+### Data Volume Limits (Alpha)
+
+| Metric | Limit | Notes |
+|---|---|---|
+| Total Opportunities | 1,000 | Sufficient for single user |
+| Total Applications | 500 | |
+| Total Documents | 500 | |
+| Total Knowledge Entries | 2,000 | |
+| Single Document Size | 50 MB | PDF, images, documents |
+| Total Storage | 5 GB | Across all documents |
+
+### UI Performance
 
 - Initial page load should feel immediate.
-- Navigation between workspaces should be seamless.
-- Search results should appear with minimal perceived delay.
+- Navigation between workspaces should be seamless (< 100 ms perceived).
+- Search results should appear within 500 ms.
 - Dashboard widgets should load independently where appropriate.
-
-### Operations
-
-Examples:
-
-Create Opportunity
-
-Update Status
-
-Quick Capture
-
-Search
-
-Open Workspace
-
-Generate Weekly Review
-
-should all complete within user expectations for a modern web application.
-
-Long-running operations should provide visible progress indicators.
 
 ---
 
@@ -8280,19 +8294,25 @@ The domain model should remain stable as scale increases.
 
 # 25.5 Availability
 
+### Quantitative Targets
+
+| Metric | Alpha Target | Production Target |
+|---|---|---|
+| Uptime | 99.5% | 99.9% |
+| Maximum unplanned downtime per month | 3.6 hours | 43 minutes |
+| Mean Time Between Failures (MTBF) | 720 hours | 720 hours |
+| Mean Time To Recovery (MTTR) | 4 hours | 1 hour |
+
+### Degradation Behavior
+
 CareerOS should remain usable during:
 
-Temporary integration failures
+- Temporary integration failures (AI provider down → skip AI features)
+- Network instability (cached data available offline)
+- Partial backend outages (read operations continue)
+- Third-party service interruptions (graceful fallback)
 
-Network instability
-
-Partial backend outages
-
-AI provider outages
-
-Third-party service interruptions
-
-Critical workflows should degrade gracefully.
+Critical workflows should degrade gracefully. The system should never show a blank error page.
 
 ---
 
