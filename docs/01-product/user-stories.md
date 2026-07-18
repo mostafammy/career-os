@@ -14,6 +14,8 @@
 ## Purpose
 This document translates the CareerOS Vision and User Personas into actionable User Stories. These stories follow the core loop defined in the vision: *Capture → Understand → Decide → Prepare → Execute → Reflect → Learn → Improve*.
 
+**Personas are defined in:** `docs/01-product/user-personas.md`
+
 ---
 
 ## 1. Capture & Organization
