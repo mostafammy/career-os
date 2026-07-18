@@ -105,7 +105,7 @@ OpportunityRestored
 
 OpportunityExpired
 
-OpportunityCompleted
+OpportunityActioned
 
 Notice there is no generic:
 
