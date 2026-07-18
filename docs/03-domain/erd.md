@@ -12,9 +12,9 @@
 ---
 
 ## Purpose
-This document provides a visual representation of the domain entities and their relationships as defined in `entities.md`. It uses Mermaid syntax to generate the diagram, illustrating the structural cardinality and relationships between Aggregates.
+This document provides a visual representation of the domain entities and their relationships as defined in the canonical `docs/03-domain/entities.md`. It uses Mermaid syntax to generate the diagram, illustrating the structural cardinality and relationships between Aggregates.
 
-*Note: This is a semantic domain model ERD, not a strict database schema diagram. It describes conceptual relationships, not foreign keys or join tables.*
+*Note: This is a semantic domain model ERD, not a strict database schema diagram. It describes conceptual relationships, not foreign keys or join tables. For the physical schema, see `docs/05-engineering/database.md`.*
 
 ---
 
@@ -213,6 +213,6 @@ Relationships that cross these context boundaries (e.g., `GOAL` influencing `OPP
 ## Open Items for v1.2
 
 1. Model `DECISION_JOURNAL` and its `REFLECTION` linkage.
-2. Model `TASK`, `CONTACT`, and `TEMPLATE` once their lifecycles are ratified.
+2. Model `TASK`, `CONTACT`, and `TEMPLATE` once their lifecycles are ratified in `state-machines.md`.
 3. Decide `CAREER_CAPITAL` representation (derived view vs. materialized aggregate).
-4. Resolve governance: this ERD is Canonical while its source (`domain-model.md`) remains Draft — promote `domain-model.md` or downgrade this doc's status.
+4. Physical schema design: see `docs/05-engineering/database.md` for implementation.
