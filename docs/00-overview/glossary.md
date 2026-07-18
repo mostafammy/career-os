@@ -14,6 +14,8 @@ Every term in this document has **one authoritative meaning**. Product documenta
 
 This glossary follows the principles of **Domain-Driven Design (DDD)** and represents the **Ubiquitous Language** of CareerOS.
 
+**For complete entity definitions, see:** `docs/03-domain/entities.md`
+
 ---
 
 # Guiding Principles
