@@ -319,37 +319,23 @@ AI Insights
 
 Lifecycle
 
+**Canonical Definition:** `docs/03-domain/state-machines.md` (§1 - Opportunity Lifecycle)
+
 ```
 
-Captured
+CAPTURED
 
 ↓
 
-Researching
+EVALUATING
 
 ↓
 
-Preparing
+ACTIONED
 
 ↓
 
-Ready
-
-↓
-
-Submitted
-
-↓
-
-Interview
-
-↓
-
-Completed
-
-↓
-
-Archived
+ARCHIVED
 
 ```
 
@@ -431,41 +417,27 @@ Timeline
 
 Lifecycle
 
+**Canonical Definition:** `docs/03-domain/state-machines.md` (§2 - Application Lifecycle)
+
 ```
 
-Draft
+DRAFTING
 
 ↓
 
-Preparing
+SUBMITTED
 
 ↓
 
-Submitted
+INTERVIEWING
 
 ↓
 
-Interview
+OFFER_RECEIVED
 
 ↓
 
-Offer
-
-↓
-
-Accepted
-
-↓
-
-Rejected
-
-↓
-
-Withdrawn
-
-↓
-
-Archived
+ACCEPTED / REJECTED / DECLINED / WITHDRAWN
 
 ```
 
